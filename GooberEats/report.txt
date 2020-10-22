@@ -1,0 +1,17 @@
+StreetMap::load()
+
+If the StreetMap holds N geo-coordinates, and each geo-coordinate is associated with S street segments on average, in the average case, since we re-hash ExpandableHashTable if the load factor goes above a maxLoadFactor, load() should run in O(N) time.
+
+StreetMap::getSegmentsThatStartWith()
+
+If the StreetMap holds N geo-coordinates, and each geo-coordinate is associated with S street segments on average, getSegmentsThatStartWith is O(S) in the worst case. On average, because we re-hash ExpandableHashTable if the load factor goes above a maxLoadFactor, getSegmentsThatStartWith() should run in O(1) time. 
+
+PointToPointRouter::generatePointToPointRoute()
+
+For this function I used the A* algorithm to generate the shortest path between two GeoCoords. I used three ExpandableHashMaps to do so: a map called parentMap which mapped a GeoCoord to another GeoCoord, a map called gValues which mapped a GeoCoord to a double, and a map called fValues which mapped a GeoCoord to a double. I also implemented a STL priority_queue which I called openSet. 
+
+I added the start GeoCoord to openSet. I also mapped it to its f and g values (0) in the respective fValue and gValue maps. Then until I reached the end GeoCoord, I popped the top value off of openSet. I used StreetMap::getSegmentsThatStartWith() to find any neighboring GeoCoords. Then for each neighbor, I calculated its f and g values. I also mapped the neighbor to its parent GeoCoord. I checked whether the neighbor was already in openSet; if it was, and if the g value I had just calculated was less than its g value in openSet, I remapped it to the newly calculated f and g values. If it wasn't in the set, I mapped it to the newly calculated f and g values and then added it to the openSet. Then once I reached the end GeoCoord, I could reconstruct the complete route by tracing backwards through parentMap.
+
+DeliveryOptimizer::optimizeDeliveryOrder()
+
+For this function I used simulated annealing to approximate a solution to the traveling salesman problem. I used two vectors which held DeliveryRequests called newDeliveries and tentativeNewDeliveries. These were both assigned the value of the original deliveries vector in the beginning. I used a start temperature of 100 and cooled it each iteration with a coolingRate of 0.99. While the temperature was greater than 0.01, I generated a new random path by swapping two DeliveryRequests in the tentativeNewDeliveries vector. I then calculated the tentativeNewCrowsDistance based on this new path. If the new path was shorter than the previous path, I set newDeliveries = tentativeNewDeliveries. Otherwise, I used the simulated annealing probability function to generate a random probability that newDeliveries = tentativeNewDeliveries. After the temperature cooled to less than 0.01, I found the newCrowDistance using newDeliveries.
